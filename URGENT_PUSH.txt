@@ -1,0 +1,43 @@
+🚨 URGENT: PUSH TO GITHUB IN 2 MINUTES
+
+YOUR REPO: https://github.com/aleena47/FCP.git
+
+METHOD 1: GITHUB DESKTOP (FASTEST - 2 minutes)
+1. Download: https://desktop.github.com/
+2. Install and open GitHub Desktop
+3. File → Add Local Repository
+4. Browse: C:\Users\DELL\Downloads\FCP
+5. Click "Add"
+6. Bottom: Type "Initial commit"
+7. Click "Commit to main"
+8. Click "Publish repository"
+9. Name: FCP, Description: "AI-Powered E-Commerce Platform"
+10. Choose Public, Click Publish
+DONE! ✅
+
+METHOD 2: RESTART TERMINAL (If Git is installed)
+1. CLOSE this PowerShell window
+2. Open NEW PowerShell window
+3. Run these commands:
+
+cd C:\Users\DELL\Downloads\FCP
+git init
+git remote add origin https://github.com/aleena47/FCP.git
+git add .
+git commit -m "Initial commit: AI-powered e-commerce platform"
+git branch -M main
+git push -u origin main
+
+When asked for credentials:
+- Username: aleena47
+- Password: Create Personal Access Token at https://github.com/settings/tokens
+  (Select "repo" scope, use token as password)
+
+URGENT ALTERNATIVE: 
+If GitHub Desktop doesn't work fast enough:
+1. Zip your entire FCP folder (except node_modules and .env)
+2. Go to: https://github.com/aleena47/FCP
+3. Click "uploading an existing file"
+4. Upload the zip file
+5. Extract in GitHub (if possible) or mention it's zipped in README
+

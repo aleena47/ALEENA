@@ -1,0 +1,143 @@
+.collections-page {
+  min-height: calc(100vh - 80px);
+}
+
+.collections-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.collections-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.collections-header p {
+  font-size: 1.25rem;
+  opacity: 0.9;
+}
+
+.collections-content {
+  padding: 4rem 2rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 3rem;
+}
+
+.collection-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.collection-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.collection-image {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+}
+
+.collection-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.collection-card:hover .collection-image img {
+  transform: scale(1.1);
+}
+
+.collection-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.7));
+  display: flex;
+  align-items: flex-end;
+  padding: 1.5rem;
+}
+
+.collection-count {
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.collection-info {
+  padding: 2rem;
+}
+
+.collection-info h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.collection-info p {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.collection-btn {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.collection-btn:hover {
+  background: #4f46e5;
+}
+
+.collections-loading,
+.no-collections {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  color: #666;
+}
+
+.loader {
+  font-size: 1.5rem;
+  color: #6366f1;
+}
+
+@media (max-width: 768px) {
+  .collections-header h1 {
+    font-size: 2rem;
+  }
+
+  .collections-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
