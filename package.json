@@ -6,11 +6,12 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "build": "cd client && npm install && npm run build",
+    "install": "npm install && cd client && npm install",
     "seed:supabase": "node scripts/seed_supabase.js",
     "seed:products": "node scripts/setup_database.js",
     "check:db": "node scripts/create_tables.js",
     "client": "cd client && npm start",
-    "build": "cd client && npm run build",
     "install-client": "cd client && npm install",
     "install-server": "npm install"
   },
@@ -27,7 +28,8 @@
     "jsonwebtoken": "^9.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "react-scripts": "5.0.1"
   },
   "keywords": ["clothing", "e-commerce", "ai", "fashion"],
   "author": "",
