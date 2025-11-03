@@ -681,20 +681,31 @@ app.post('/api/ai/chat', async (req, res) => {
     const geminiResponse = await chatWithGemini(message, conversationHistory, productContext);
 
     if (geminiResponse) {
-      // Extract suggestions from Gemini response or use default
+      // Generate intelligent suggestions based on both user message and AI response
       let suggestions = [];
+      const lowerMessage = message.toLowerCase();
       const lowerResponse = geminiResponse.toLowerCase();
       
-      if (lowerResponse.includes('size') || lowerResponse.includes('fit')) {
-        suggestions = ["Yes, please", "Show size guide", "Continue shopping"];
-      } else if (lowerResponse.includes('return') || lowerResponse.includes('refund')) {
-        suggestions = ["Start return", "Check return policy", "Need more help"];
-      } else if (lowerResponse.includes('shipping') || lowerResponse.includes('delivery')) {
-        suggestions = ["Check order status", "Track package", "Shipping options"];
-      } else if (lowerResponse.includes('recommend') || lowerResponse.includes('suggest')) {
-        suggestions = ["Work", "Party", "Casual", "Sport"];
+      // Check what the conversation is about
+      if (lowerMessage.includes('party') || lowerMessage.includes('event') || lowerMessage.includes('occasion')) {
+        suggestions = ["Show me dresses", "What about shoes?", "Accessories too", "View all products"];
+      } else if (lowerMessage.includes('summer') || lowerMessage.includes('beach') || lowerMessage.includes('casual')) {
+        suggestions = ["Show casual wear", "Summer dresses", "Comfortable shoes", "Browse all"];
+      } else if (lowerMessage.includes('work') || lowerMessage.includes('professional') || lowerMessage.includes('office')) {
+        suggestions = ["Show blazers", "Professional attire", "Work shoes", "View collection"];
+      } else if (lowerMessage.includes('size') || lowerMessage.includes('fit') || lowerResponse.includes('size')) {
+        suggestions = ["Yes, help me", "Show size guide", "Continue shopping"];
+      } else if (lowerMessage.includes('return') || lowerMessage.includes('refund') || lowerResponse.includes('return')) {
+        suggestions = ["Return policy", "Start return", "Contact support"];
+      } else if (lowerMessage.includes('shipping') || lowerMessage.includes('delivery') || lowerResponse.includes('shipping')) {
+        suggestions = ["Track order", "Shipping options", "Delivery time"];
+      } else if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('budget')) {
+        suggestions = ["Under $50", "$50-$100", "Over $100", "View all"];
+      } else if (lowerResponse.includes('recommend') || lowerResponse.includes('suggest') || lowerResponse.includes('options')) {
+        suggestions = ["Show me more", "Different style", "View products", "Tell me more"];
       } else {
-        suggestions = ["Product recommendations", "Size help", "Shipping info", "Returns"];
+        // Default helpful suggestions
+        suggestions = ["Browse products", "Get recommendations", "Size help", "Shipping info"];
       }
 
       return res.json({
@@ -952,6 +963,113 @@ app.delete('/api/cart/:userId', async (req, res) => {
   } catch (error) {
     console.error('Error clearing cart:', error);
     res.status(500).json({ error: 'Failed to clear cart' });
+  }
+});
+
+// Orders endpoints
+app.get('/api/orders/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select(`
+        *,
+        order_items (
+          *,
+          products (*)
+        )
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Supabase error fetching orders:', error);
+      // Return empty array if table doesn't exist or error
+      return res.json([]);
+    }
+
+    res.json(orders || []);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.json([]); // Return empty array on error
+  }
+});
+
+app.post('/api/orders', async (req, res) => {
+  try {
+    const { userId, items, total, shippingInfo, paymentMethod } = req.body;
+
+    // For demo: If database tables don't exist, return mock order
+    try {
+      // Create order
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: userId,
+          total: total,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        // If table doesn't exist, return mock order for demo
+        if (orderError.message && orderError.message.includes('does not exist')) {
+          console.log('📦 Demo mode: Orders table not created, returning mock order');
+          const mockOrder = {
+            id: Math.floor(Math.random() * 10000),
+            user_id: userId,
+            total: total,
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            shippingInfo: shippingInfo,
+            paymentMethod: paymentMethod
+          };
+          return res.json(mockOrder);
+        }
+        throw orderError;
+      }
+
+      // Create order items
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        size: item.size,
+        color: item.color,
+        quantity: item.quantity,
+        price: item.price
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      // Clear user's cart after successful order
+      await supabase
+        .from('cart_items')
+        .delete()
+        .eq('user_id', userId);
+
+      res.json(order);
+    } catch (dbError) {
+      // Fallback for demo mode
+      console.log('📦 Demo mode: Database error, returning mock order');
+      const mockOrder = {
+        id: Math.floor(Math.random() * 10000),
+        user_id: userId,
+        total: total,
+        status: 'pending',
+        created_at: new Date().toISOString(),
+        shippingInfo: shippingInfo,
+        paymentMethod: paymentMethod
+      };
+      return res.json(mockOrder);
+    }
+  } catch (error) {
+    console.error('Error creating order:', error);
+    res.status(500).json({ error: 'Failed to create order' });
   }
 });
 

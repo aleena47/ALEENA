@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import OrderDetail from './pages/OrderDetail';
 import Collections from './pages/Collections';
 import About from './pages/About';
 import Profile from './pages/Profile';
@@ -23,6 +25,8 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orders/:orderId" element={<OrderDetail />} />
           <Route path="/collections" element={<Collections />} />
           <Route path="/about" element={<About />} />
           <Route path="/profile" element={<Profile />} />

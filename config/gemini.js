@@ -13,11 +13,11 @@ let model = null;
 if (apiKey) {
   try {
     genAI = new GoogleGenerativeAI(apiKey);
-    // Using Gemini 2.5 Flash Pro model
-    model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-pro' });
-    console.log('Gemini 2.5 Flash Pro initialized successfully');
+    // Using Gemini 2.5 Flash (latest available model)
+    model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    console.log('✅ Gemini 2.5 Flash initialized successfully');
   } catch (error) {
-    console.error('Error initializing Gemini:', error);
+    console.error('❌ Error initializing Gemini:', error);
   }
 }
 
@@ -58,13 +58,28 @@ const chatWithGemini = async (message, conversationHistory = [], productContext 
 Available products context:
 ${productContext}
 
-Be friendly, helpful, and concise. If asked about specific products, refer to the product context provided.`;
+IMPORTANT GUIDELINES:
+- Be friendly, warm, and conversational
+- Keep responses concise (2-3 sentences max)
+- When recommending products, mention specific categories (dresses, tops, shoes, etc.)
+- For occasions (party, work, casual), suggest appropriate product types
+- Always end with a helpful question or call-to-action
+- Use natural, human-like language
+- Avoid markdown formatting or bullet points in responses`;
 
-    // Build conversation history
-    const history = conversationHistory.slice(-5).map(msg => ({
-      role: msg.type === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.text }]
-    }));
+    // Build conversation history - ensure it starts with 'user' role
+    let history = [];
+    if (conversationHistory && conversationHistory.length > 0) {
+      history = conversationHistory.slice(-5).map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.text }]
+      }));
+      
+      // Ensure first message is from user
+      if (history.length > 0 && history[0].role !== 'user') {
+        history = history.slice(1);
+      }
+    }
 
     const chat = model.startChat({
       history: history,
@@ -76,7 +91,7 @@ Be friendly, helpful, and concise. If asked about specific products, refer to th
       },
     });
 
-    const fullMessage = systemPrompt ? `${systemPrompt}\n\nUser: ${message}` : message;
+    const fullMessage = `${systemPrompt}\n\nUser: ${message}`;
     const result = await chat.sendMessage(fullMessage);
     const response = await result.response;
     const text = response.text();

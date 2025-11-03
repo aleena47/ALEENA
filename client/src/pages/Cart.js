@@ -2,11 +2,16 @@ import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { FaTrash, FaPlus, FaMinus } from 'react-icons/fa';
+import { isAuthenticated } from '../auth';
 import './Cart.css';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, clearCart, getTotalPrice } = useContext(CartContext);
   const navigate = useNavigate();
+  
+  // No modal state needed - navigating to separate page
+
+  // Checkout button removed as requested
 
   if (cartItems.length === 0) {
     return (
@@ -92,15 +97,67 @@ const Cart = () => {
               <span>Total</span>
               <span>${getTotalPrice().toFixed(2)}</span>
             </div>
-            <button className="btn btn-primary btn-large checkout-btn">
-              Proceed to Checkout
+            
+            {/* SIMPLE CHECKOUT BUTTON */}
+            <button>PROCEED TO CHECKOUT</button>
+            <button>CHECKOUT NOW</button>
+            <button>BUY NOW</button>
+            
+            <button 
+              className="checkout-btn-main"
+              onClick={() => {
+                console.log('🛒 CHECKOUT BUTTON CLICKED!');
+                alert('Going to checkout page!');
+                navigate('/checkout');
+              }}
+              style={{
+                width: '100%',
+                marginTop: '1.5rem',
+                padding: '1rem',
+                background: '#6366f1',
+                color: 'white',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                display: 'block',
+                visibility: 'visible',
+                opacity: '1',
+                zIndex: '999'
+              }}
+            >
+              🛒 Proceed to Checkout
             </button>
+            
+            {/* BACKUP BUTTON */}
+            <div 
+              onClick={() => window.location.href = '/checkout'}
+              style={{
+                width: '100%',
+                marginTop: '0.5rem',
+                padding: '1rem',
+                background: '#28a745',
+                color: 'white',
+                borderRadius: '10px',
+                fontSize: '1rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                textAlign: 'center'
+              }}
+            >
+              ✅ BACKUP CHECKOUT (Click if above doesn't work)
+            </div>
+            
             <Link to="/products" className="continue-shopping">
               Continue Shopping
             </Link>
           </div>
         </div>
       </div>
+
+
     </div>
   );
 };

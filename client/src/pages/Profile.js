@@ -14,6 +14,7 @@ const Profile = () => {
     email: '',
     created_at: '',
   });
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,6 +33,26 @@ const Profile = () => {
             email: user.email || '',
             memberSince: user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '',
           });
+
+          // Fetch user's orders
+          try {
+            const ordersRes = await axios.get(`/api/orders/${user.id}`);
+            let fetchedOrders = ordersRes.data || [];
+            
+            // If no orders from database, check localStorage for demo orders
+            if (fetchedOrders.length === 0) {
+              const demoOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+              // Filter orders for current user
+              fetchedOrders = demoOrders.filter(order => order.user_id === user.id);
+            }
+            
+            setOrders(fetchedOrders);
+          } catch (ordersError) {
+            console.error('Error fetching orders:', ordersError);
+            // Fallback to localStorage demo orders
+            const demoOrders = JSON.parse(localStorage.getItem('demo_orders') || '[]');
+            setOrders(demoOrders);
+          }
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -53,13 +74,17 @@ const Profile = () => {
     window.location.reload(); // Refresh to update Header
   };
 
-  // Static data for orders, wishlist, etc. (can be fetched from API later)
+  // Format orders for display
+  const formattedOrders = orders.map(order => ({
+    id: order.id,
+    date: new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+    total: parseFloat(order.total).toFixed(2),
+    status: order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Pending',
+    items: order.order_items?.length || order.items?.length || 0
+  }));
+
   const profileData = {
-    orders: [
-      { id: 1, date: '2024-01-15', total: 129.99, status: 'Delivered', items: 2 },
-      { id: 2, date: '2024-01-10', total: 79.99, status: 'Shipped', items: 1 },
-      { id: 3, date: '2024-01-05', total: 199.99, status: 'Delivered', items: 1 }
-    ],
+    orders: formattedOrders,
     wishlist: (cartItems || []).slice(0, 3),
     preferences: {
       favoriteStyle: 'Casual',
